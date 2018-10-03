@@ -24,8 +24,9 @@ type DirectMessageEvent struct {
 // DirectMessageEventMessage contains message contents, along with sender and
 // target recipient.
 type DirectMessageEventMessage struct {
-	SenderID string `json:"sender_id"`
-	Target   struct {
+	SenderID         string `json:"sender_id"`
+	SenderScreenName string `json:"sender_screen_name"`
+	Target           struct {
 		RecipientID string `json:"recipient_id"`
 	} `json:"target"`
 	Data struct {
