@@ -30,7 +30,7 @@ type DirectMessageEventMessage struct {
 	} `json:"target"`
 	Data struct {
 		Text       string    `json:"text"`
-		Entities   *Entities `json:"entitites"`
+		Entities   *Entities `json:"entities"`
 		Attachment struct {
 			Type  string      `json:"type"`
 			Media MediaEntity `json:"media"`
