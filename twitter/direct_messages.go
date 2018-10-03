@@ -27,7 +27,8 @@ type DirectMessageEventMessage struct {
 	SenderID         string `json:"sender_id"`
 	SenderScreenName string `json:"sender_screen_name"`
 	Target           struct {
-		RecipientID string `json:"recipient_id"`
+		RecipientID         string `json:"recipient_id"`
+		RecipientScreenName string `json:"recipient_screen_name"`
 	} `json:"target"`
 	Data struct {
 		Text       string    `json:"text"`
