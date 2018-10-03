@@ -5,7 +5,7 @@ package twitter
 // TODO: symbols
 type Entities struct {
 	Hashtags     []HashtagEntity `json:"hashtags"`
-	Media        []MediaEntity   `json:"media"`
+	Symbols      []HashtagEntity `json:"symbols"`
 	Urls         []URLEntity     `json:"urls"`
 	UserMentions []MentionEntity `json:"user_mentions"`
 }
