@@ -24,20 +24,26 @@ type DirectMessageEvent struct {
 // DirectMessageEventMessage contains message contents, along with sender and
 // target recipient.
 type DirectMessageEventMessage struct {
-	SenderID         string `json:"sender_id"`
-	SenderScreenName string `json:"sender_screen_name"`
-	Target           struct {
-		RecipientID         string `json:"recipient_id"`
-		RecipientScreenName string `json:"recipient_screen_name"`
-	} `json:"target"`
-	Data struct {
-		Text       string    `json:"text"`
-		Entities   *Entities `json:"entities"`
-		Attachment struct {
-			Type  string      `json:"type"`
-			Media MediaEntity `json:"media"`
-		} `json:"attachment"`
-	} `json:"message_data"`
+	SenderID         string               `json:"sender_id"`
+	SenderScreenName string               `json:"sender_screen_name"`
+	Target           DMEventMessageTarget `json:"target"`
+	Data             DMEventMessageData   `json:"message_data"`
+}
+
+type DMEventMessageTarget struct {
+	RecipientID         string `json:"recipient_id"`
+	RecipientScreenName string `json:"recipient_screen_name"`
+}
+
+type DMEventMessageData struct {
+	Text       string                       `json:"text"`
+	Entities   *Entities                    `json:"entities"`
+	Attachment DMEventMessageDataAttachment `json:"attachment"`
+}
+
+type DMEventMessageDataAttachment struct {
+	Type  string      `json:"type"`
+	Media MediaEntity `json:"media"`
 }
 
 // DirectMessageService provides methods for accessing Twitter direct message
