@@ -8,50 +8,58 @@ import (
 )
 
 // DirectMessageEvents lists Direct Message events.
-type DirectMessageEvents struct {
-	Events     []DirectMessageEvent `json:"events"`
-	NextCursor string               `json:"next_cursor"`
-}
+type (
+	DirectMessageEvents struct {
+		Events     []DirectMessageEvent `json:"events"`
+		NextCursor string               `json:"next_cursor"`
+	}
 
-// DirectMessageEvent is a single Direct Message sent or received.
-type DirectMessageEvent struct {
-	CreatedAt string                     `json:"created_timestamp"`
-	ID        string                     `json:"id"`
-	Type      string                     `json:"type"`
-	Message   *DirectMessageEventMessage `json:"message_create"`
-}
+	// DirectMessageEvent is a single Direct Message sent or received.
+	DirectMessageEvent struct {
+		CreatedAt string                     `json:"created_timestamp"`
+		ID        string                     `json:"id"`
+		Type      string                     `json:"type"`
+		Message   *DirectMessageEventMessage `json:"message_create"`
+	}
 
-// DirectMessageEventMessage contains message contents, along with sender and
-// target recipient.
-type DirectMessageEventMessage struct {
-	SenderID         string               `json:"sender_id"`
-	SenderScreenName string               `json:"sender_screen_name"`
-	Target           DMEventMessageTarget `json:"target"`
-	Data             DMEventMessageData   `json:"message_data"`
-}
+	// DirectMessageEventMessage contains message contents, along with sender and
+	// target recipient.
+	DirectMessageEventMessage struct {
+		SenderID         string               `json:"sender_id"`
+		SenderScreenName string               `json:"sender_screen_name"`
+		Target           DMEventMessageTarget `json:"target"`
+		Data             DMEventMessageData   `json:"message_data"`
+	}
 
-type DMEventMessageTarget struct {
-	RecipientID         string `json:"recipient_id"`
-	RecipientScreenName string `json:"recipient_screen_name"`
-}
+	DMEventMessageTarget struct {
+		RecipientID         string `json:"recipient_id"`
+		RecipientScreenName string `json:"recipient_screen_name"`
+	}
 
-type DMEventMessageData struct {
-	Text       string                       `json:"text"`
-	Entities   *Entities                    `json:"entities"`
-	Attachment DMEventMessageDataAttachment `json:"attachment"`
-}
+	DMEventMessageData struct {
+		Text       string                       `json:"text"`
+		Entities   *Entities                    `json:"entities"`
+		Attachment DMEventMessageDataAttachment `json:"attachment"`
+	}
 
-type DMEventMessageDataAttachment struct {
-	Type  string      `json:"type"`
-	Media MediaEntity `json:"media"`
-}
+	DMEventMessageDataAttachment struct {
+		Type  string      `json:"type"`
+		Media MediaEntity `json:"media"`
+	}
 
-// DirectMessageService provides methods for accessing Twitter direct message
-// API endpoints.
-type DirectMessageService struct {
-	baseSling *sling.Sling
-	sling     *sling.Sling
-}
+	// DirectMessageService provides methods for accessing Twitter direct message
+	// API endpoints.
+	DirectMessageService struct {
+		baseSling *sling.Sling
+		sling     *sling.Sling
+	}
+
+	// DirectMessageEventsCreateResponse represents the data structure returned by
+	// the Twitter API after the successful creation of an event
+	DirectMessageEventsCreateResponse struct {
+		Event DirectMessageEvent
+	}
+)
 
 // newDirectMessageService returns a new DirectMessageService.
 func newDirectMessageService(sling *sling.Sling) *DirectMessageService {
@@ -77,6 +85,14 @@ func (s *DirectMessageService) EventsList(params *DirectMessageEventsListParams)
 	apiError := new(APIError)
 	resp, err := s.sling.New().Get("events/list.json").QueryStruct(params).Receive(events, apiError)
 	return events, resp, relevantError(err, *apiError)
+}
+
+// EventsCreate creates a new Direct Message event
+func (s *DirectMessageService) EventsCreate(event *DirectMessageEventMessage) (*DirectMessageEventsCreateResponse, *http.Response, error) {
+	apiError := new(APIError)
+	eventResponse := new(DirectMessageEventsCreateResponse)
+	resp, err := s.sling.New().Post("events/new.json").BodyJSON(event).Receive(eventResponse, apiError)
+	return eventResponse, resp, relevantError(err, *apiError)
 }
 
 // DEPRECATED
