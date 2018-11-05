@@ -59,6 +59,31 @@ type (
 	DirectMessageEventsCreateResponse struct {
 		Event DirectMessageEvent
 	}
+
+	// DirectMessageEventsListParams are the parameters for
+	// DirectMessageService.EventsList
+	DirectMessageEventsListParams struct {
+		Cursor string `url:"cursor,omitempty"`
+		Count  int    `url:"count,omitempty"`
+	}
+
+	directMessageEventsCreateData struct {
+		Text string `json:"text"`
+	}
+	directMessageEventsCreateTarget struct {
+		RecipientID string `json:"recipient_id"`
+	}
+	directMessageEventsCreateMessage struct {
+		Target *directMessageEventsCreateTarget `json:"target"`
+		Data   *directMessageEventsCreateData   `json:"message_data"`
+	}
+	directMessageEventsCreateEvent struct {
+		Type    string                            `json:"type"`
+		Message *directMessageEventsCreateMessage `json:"message_create"`
+	}
+	directMessageEventsCreateParams struct {
+		Event *directMessageEventsCreateEvent `json:"event"`
+	}
 )
 
 // newDirectMessageService returns a new DirectMessageService.
@@ -67,13 +92,6 @@ func newDirectMessageService(sling *sling.Sling) *DirectMessageService {
 		baseSling: sling.New(),
 		sling:     sling.Path("direct_messages/"),
 	}
-}
-
-// DirectMessageEventsListParams are the parameters for
-// DirectMessageService.EventsList
-type DirectMessageEventsListParams struct {
-	Cursor string `url:"cursor,omitempty"`
-	Count  int    `url:"count,omitempty"`
 }
 
 // EventsList returns Direct Message events (both sent and received) within
@@ -89,13 +107,26 @@ func (s *DirectMessageService) EventsList(params *DirectMessageEventsListParams)
 
 // EventsCreate creates a new Direct Message event
 func (s *DirectMessageService) EventsCreate(event *DirectMessageEventMessage) (*DirectMessageEventsCreateResponse, *http.Response, error) {
+	apiParams := &directMessageEventsCreateParams{
+		Event: &directMessageEventsCreateEvent{
+			Type: "message_create",
+			Message: &directMessageEventsCreateMessage{
+				Target: &directMessageEventsCreateTarget{
+					RecipientID: event.Target.RecipientID,
+				},
+				Data: &directMessageEventsCreateData{
+					Text: event.Data.Text,
+				},
+			},
+		},
+	}
 	apiError := new(APIError)
 	eventResponse := new(DirectMessageEventsCreateResponse)
-	resp, err := s.sling.New().Post("events/new.json").BodyJSON(event).Receive(eventResponse, apiError)
+	resp, err := s.sling.New().Post("events/new.json").BodyJSON(apiParams).Receive(eventResponse, apiError)
 	return eventResponse, resp, relevantError(err, *apiError)
 }
 
-// DEPRECATED
+// DEPRECATED ********************************************************************************************************************************************
 
 // DirectMessage is a direct message to a single recipient (DEPRECATED).
 type DirectMessage struct {
