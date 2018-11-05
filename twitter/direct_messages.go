@@ -2,6 +2,7 @@ package twitter
 
 import (
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/dghubble/sling"
@@ -124,6 +125,16 @@ func (s *DirectMessageService) EventsCreate(event *DirectMessageEventMessage) (*
 	eventResponse := new(DirectMessageEventsCreateResponse)
 	resp, err := s.sling.New().Post("events/new.json").BodyJSON(apiParams).Receive(eventResponse, apiError)
 	return eventResponse, resp, relevantError(err, *apiError)
+}
+
+// CreatedAtTime returns the UTC time a Direct Message was created from Twitter's timestamp.
+func (d DirectMessageEvent) CreatedAtTime() (date time.Time, err error) {
+	milli, err := strconv.ParseInt(d.CreatedAt, 10, 64)
+	if err != nil {
+		return date, err
+	}
+	date = time.Unix(milli/1000, 0).UTC()
+	return date, err
 }
 
 // DEPRECATED ********************************************************************************************************************************************
